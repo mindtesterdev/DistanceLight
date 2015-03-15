@@ -6,6 +6,8 @@ Parts of the code are based on the Arduino Ping sensor example.
 - Expects HC-SR04 Ranging Detector Mod Distance Sensor Trigger and Echo pins connected to pins 3 and 6.
 - Expects one standard RGB LED (the red green and blue #defines are for those pins on the LED.)
 - Expects one momentary normally open button that throws HIGH to buttonPin when pressed.
+ 
+
 LED will be green at >target distance + 150CM (5 Ft.)
 LED gradients yellow to red from Target Distance+150CM to Target Distance
 At target distance LED flashes red 5 times then goes to solid red.
