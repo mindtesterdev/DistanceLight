@@ -18,12 +18,12 @@ Pressing the button and holding for 3 seconds will save the currently measured d
 
 The LED will turn blue while you're holding it, then flash green 3 times when the setting is saved to the first 4 bytes of the EEPROM.
 
-LED color is based on a smoothed average that discards all raw values +/- 1 Standard Deviation from the average set.
-
 Continuing to hold the button for another 3 seconds will cause the LED to turn red and the EEPROM will be written out all zeros. 
+
+LED color is based on a smoothed average that discards all raw values +/- 1 Standard Deviation from the average set.
 
 If you put this on a hackduino / fresh ATMEGA chip with a programmer you may need to clear EEPROM with above procedure to get the sensor to behave properly (I had some strange results with a new chip).
 
-The serial is only enabled for debugging, you could remove all of that if you weren't going to make any changes to make the compiled sketch smaller.
+The serial is only enabled for debugging, you could remove all of that if you weren't going to make any changes to make the compiled sketch smaller. You could also remove all math for Metric/Imperial conversion, since that was only for my benefit here in the US.
 
 Distributed under GPLv3
