@@ -2,6 +2,7 @@
 Arduino Sketch for my ultrasonic parking guide
 
 This is the code to my ultrasonic parking guide (ie a glorified tennisball on a string).
+Device plans can be found at http://www.instructables.com/id/Hackduino-Arduino-Ultrasonic-Parking-Guide/
 Parts of the code are based on the Arduino Ping sensor example.
 
 - Expects HC-SR04 Ranging Detector Mod Distance Sensor Trigger and Echo pins connected to pins 3 and 6.
