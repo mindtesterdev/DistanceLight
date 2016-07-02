@@ -1,3 +1,4 @@
+
 /*
 
 This is the code to my ultrasonic parking guide (ie a glorified tennisball on a string).
@@ -17,7 +18,7 @@ Pressing the button and holding for 3 seconds will save the currently measured d
 
 The LED will turn blue while you're holding it, then flash green 3 times when the setting is saved to the first 4 bytes of the EEPROM.
 
-Continuing to hold the button for another 3 seconds will cause the LED to turn red and the EEPROM will be written out all zeros. 
+Continuing to hold the button for another 3 seconds will cause the LED to turn red and the EEPROM will be written out all zeros.
 
 LED color is based on a smoothed average that discards all raw values +/- 1 Standard Deviation from the average set.
 
@@ -31,12 +32,12 @@ Distributed under GPLv3
 
 #include <EEPROM.h>
 
-#define trigPin 6
-#define buttonPin 2
-#define echoPin 3
-#define red 11
-#define green 10
-#define blue 9
+#define trigPin 1
+#define buttonPin 0
+#define echoPin 2
+#define red 7
+#define green 6 
+#define blue 8
 #define RANGE 600
 
 const int numReadings = 11;
@@ -51,18 +52,30 @@ long lastReading = 0;
 int flashes = 0;
 
 void setup() {
-  Serial.begin (115200);
+//  Serial.begin (115200);
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
   pinMode(buttonPin, INPUT);
   pinMode(red, OUTPUT);
   pinMode(green, OUTPUT);
   pinMode(blue, OUTPUT);
+  digitalWrite(red, HIGH);
+  delay(100);
+  digitalWrite(red, LOW);
+  delay(100);
+    digitalWrite(green, HIGH);
+  delay(100);
+  digitalWrite(green, LOW);
+  delay(100);
+    digitalWrite(blue, HIGH);
+  delay(100);
+  digitalWrite(blue, LOW);
+  delay(100);
   target = getTargetFromEEPROM();
   if(target == 0)
     target = defaultTarget;
   for (int thisReading = 0; thisReading < numReadings; thisReading++)
-    distances[thisReading] = 0;  
+    distances[thisReading] = 0;
 }
 
 long getDistance()
@@ -76,21 +89,21 @@ long getDistance()
   digitalWrite(trigPin, LOW);
   duration = pulseIn(echoPin, HIGH);
   distance = (duration/2) / 29.1;
-  
-  if(distance <= RANGE & 
+
+  if(distance <= RANGE &
     distance > 0)
   {
-    total= total - distances[readIndex];    
+    total= total - distances[readIndex];
     distances[readIndex] = distance;
     total= total+distances[readIndex];
     readIndex = readIndex+1;
-    
+
     if(readIndex >= numReadings)
       readIndex = 0;
-      
+
     average = getCleanAverage(); //total/numReadings;
     int d = average - lastAverage;
-    
+
     if(abs(d) >= 5)
     {
       lastAverage = average;
@@ -99,12 +112,12 @@ long getDistance()
      int feet = (average/2.5)/12;
      int inches = (distance/2.5);
      inches = inches %12;
-     Serial.print(feet);
-     Serial.print("'");  
+/*     Serial.print(feet);
+     Serial.print("'");
      Serial.print(inches);
      Serial.print("\" / Raw: ");
      Serial.print(distance/2.5);
-     Serial.println(" inches");
+     Serial.println(" inches");*/
     }
   }
 
@@ -116,7 +129,7 @@ void loop() {
 
   long distance = getDistance();
 
-  if(distance <= RANGE & 
+  if(distance <= RANGE &
     distance > 0 &
     digitalRead(buttonPin) == LOW)
     {
@@ -127,20 +140,20 @@ void loop() {
       }
       else if(average >= target+150)
       {
-        writeColor(0, 254,0);          
+        writeColor(0, 254,0);
       }
-      else if(average < target+150 
+      else if(average < target+150
         & average > target
         )
       {
-        
+
       flashes = 0;
       int D = average-target;
-      int Top = target+150;      
+      int Top = target+150;
       int R = map(average, Top, target, 50, 100);
-      int G = map(average, target, Top, 100, 254);    
-      writeColor(R,G,0);     
-      
+      int G = map(average, target, Top, 100, 254);
+      writeColor(R,G,0);
+
     }
     else if (average <=target)
     {
@@ -149,18 +162,18 @@ void loop() {
         writeColor(10, 0, 0);
         delay(100);
         writeColor(254, 0, 0);
-        delay(100);          
+        delay(100);
         flashes++;
       }
-      else 
+      else
         writeColor(254, 0, 0);
-    }       
+    }
   }
   else if(digitalRead(buttonPin) == HIGH)
   {
     setTarget();
   }
-  
+
   delay(20);
 }
 
@@ -169,7 +182,7 @@ long getCleanAverage()
   long RetVal = 0;
   long V[numReadings];
   unsigned long T = 0;
-  unsigned long mean; 
+  unsigned long mean;
   unsigned long stdDev = 0;
   int sig = 0;
 
@@ -182,39 +195,39 @@ long getCleanAverage()
     }
   }
   mean = T/sig;
-  
+
   for (int i = 0; i <numReadings; i++)
   {
     V[i] = distances[i] - mean;
     V[i] = V[i]*V[i];
   }
-  
+
   T = 0;
 
   for (int i = 0; i <sig; i++)
-  {    
+  {
     T+= V[i];
   }
-  
+
   stdDev = T /sig;
   stdDev = sqrt(stdDev);
   sig=0;
   T = 0;
-  
+
   for (int i = 0; i<numReadings; i++)
-  {   
+  {
      if(distances[i] <= mean + stdDev & distances[i] >= mean-stdDev)
         {
           sig++;
           T+= distances[i];
         }
-  }  
- 
+  }
+
   RetVal = T/sig;
-  
+
   if(RetVal == -1)
     RetVal = average; //If we fail the calculation, just return the existing average to keep everything smoothed.
-    
+
   return RetVal;
 }
 
@@ -233,21 +246,21 @@ void setTarget()
       {
         target = average;
         writeTargetToEEPROM(target);
-        Serial.print("Setting Target Distance: ");
-        Serial.println(target);
+        //Serial.print("Setting Target Distance: ");
+        //Serial.println(target);
       }
       if(greenFlashes < 5)
       {
         writeColor(0, 0, 0);
         delay(100);
         writeColor(0, 254, 0);
-        delay(100);          
+        delay(100);
         greenFlashes++;
       }
-      else 
+      else
         writeColor(0, 254, 0);
     }
-    else 
+    else
       writeColor(0,0,254);
 
     if(millis() - buttonPressed >= 6000 & !EEPROMClear)
@@ -260,10 +273,10 @@ void setTarget()
         writeColor(0, 0, 0);
         delay(100);
         writeColor(0, 0, 254);
-        delay(100);          
+        delay(100);
         blueFlashes++;
       }
-      else 
+      else
         writeColor(0, 0, 254);
     }
     else
@@ -274,7 +287,7 @@ void setTarget()
 }
 
 void writeColor(int Red, int Green, int Blue)
-{ 
+{
   analogWrite(red, Red);
   analogWrite(green, Green);
   analogWrite(blue, Blue);
@@ -283,13 +296,13 @@ void writeColor(int Red, int Green, int Blue)
 
 void clearEEPROM()
 {
-  Serial.print("Clearing EEPROM... ");
+  //Serial.print("Clearing EEPROM... ");
 
   writeColor(254, 0, 0);
-  for (int i = 0; i < 1024; i++)
+  for (int i = 0; i < 512; i++)
     EEPROM.write(i, 0);
 
-  Serial.println("DONE.");
+  //Serial.println("DONE.");
 
 }
 
@@ -303,14 +316,14 @@ long getTargetFromEEPROM()
 
   retVal = (unsigned long)(buf[3] << 24) | (buf[2] << 16) | (buf[1] << 8) | buf[0];
 
-  Serial.print("EEPROM Target: ");
-  Serial.println(retVal);
+  //Serial.print("EEPROM Target: ");
+  //Serial.println(retVal);
   return retVal;
 }
 
 void writeTargetToEEPROM(long target)
 {
-  byte buf[4];  
+  byte buf[4];
   buf[0] = (byte) target;
   buf[1] = (byte) target >> 8;
   buf[2] = (byte) target >> 16;
@@ -319,7 +332,6 @@ void writeTargetToEEPROM(long target)
   for(int i = 0; i<4; i++)
     EEPROM.write(i, buf[i]);
 
-  Serial.print("Wrote EEPROM Target: ");
-  Serial.println(target);
+ // Serial.print("Wrote EEPROM Target: ");
+ // Serial.println(target);
 }
-
